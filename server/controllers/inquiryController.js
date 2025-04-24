@@ -1,13 +1,12 @@
 // server/controllers/inquiryController.js
 const Inquiry = require('../models/Inquiry');
 const User = require('../models/User');
-const notificationService = require('../services/notificationService');
 
 const inquiryController = {
     // Get all inquiries
     getAll: async (req, res) => {
         try {
-            const { hotelId, status, startDate, endDate, assignedTo } = req.query;
+            const { hotelId, status, startDate, endDate } = req.query;
             
             // Build query filters
             const filters = {};
@@ -23,10 +22,6 @@ const inquiryController = {
                 filters.status = status;
             }
             
-            if (assignedTo) {
-                filters.assignedTo = assignedTo;
-            }
-            
             // Date range filter
             if (startDate || endDate) {
                 filters.createdAt = {};
@@ -39,8 +34,6 @@ const inquiryController = {
             }
             
             const inquiries = await Inquiry.find(filters)
-                .populate('assignedTo', 'name email')
-                .populate('hotelId', 'name')
                 .sort({ createdAt: -1 });
             
             res.status(200).json(inquiries);
@@ -52,10 +45,7 @@ const inquiryController = {
     // Get inquiry by ID
     getById: async (req, res) => {
         try {
-            const inquiry = await Inquiry.findById(req.params.id)
-                .populate('assignedTo', 'name email')
-                .populate('hotelId', 'name')
-                .populate('source.agentId', 'name company');
+            const inquiry = await Inquiry.findById(req.params.id);
             
             if (!inquiry) {
                 return res.status(404).json({ message: 'Inquiry not found' });
@@ -63,7 +53,7 @@ const inquiryController = {
             
             // Check if user has access to this inquiry's hotel
             if (req.user.role !== 'SYSTEM_ADMIN' && 
-                req.user.hotelId.toString() !== inquiry.hotelId._id.toString()) {
+                req.user.hotelId.toString() !== inquiry.hotelId.toString()) {
                 return res.status(403).json({ message: 'Access denied' });
             }
             
@@ -82,7 +72,6 @@ const inquiryController = {
                 eventDetails,
                 requirements,
                 source,
-                assignedTo,
                 status,
                 notes
             } = req.body;
@@ -99,23 +88,12 @@ const inquiryController = {
                 eventDetails,
                 requirements,
                 source,
-                assignedTo,
+                assignedTo: req.user.id, // Assign to the creator by default
                 status: status || 'NEW',
                 notes: notes ? [{ text: notes, addedBy: req.user.id }] : []
             });
             
             const savedInquiry = await inquiry.save();
-            
-            // If assigned to someone, send notification
-            if (assignedTo) {
-                await notificationService.createNotification({
-                    userId: assignedTo,
-                    title: 'New Inquiry Assigned',
-                    message: `You have been assigned a new inquiry from ${client.name || 'a potential client'}`,
-                    relatedModel: 'Inquiry',
-                    relatedId: savedInquiry._id
-                });
-            }
             
             res.status(201).json(savedInquiry);
         } catch (error) {
@@ -147,11 +125,6 @@ const inquiryController = {
                 return res.status(403).json({ message: 'Access denied' });
             }
             
-            // Track if assignment changed to send notification
-            const assignmentChanged = assignedTo && 
-                                     (!inquiry.assignedTo || 
-                                      inquiry.assignedTo.toString() !== assignedTo);
-            
             // Update fields
             if (client) inquiry.client = client;
             if (eventDetails) inquiry.eventDetails = eventDetails;
@@ -163,17 +136,6 @@ const inquiryController = {
             inquiry.updatedAt = Date.now();
             
             const updatedInquiry = await inquiry.save();
-            
-            // Send notification if inquiry was assigned to someone new
-            if (assignmentChanged) {
-                await notificationService.createNotification({
-                    userId: assignedTo,
-                    title: 'Inquiry Assigned',
-                    message: `You have been assigned an inquiry from ${inquiry.client.name || 'a potential client'}`,
-                    relatedModel: 'Inquiry',
-                    relatedId: updatedInquiry._id
-                });
-            }
             
             res.status(200).json(updatedInquiry);
         } catch (error) {
@@ -201,7 +163,7 @@ const inquiryController = {
                 return res.status(403).json({ message: 'You do not have permission to delete inquiries' });
             }
             
-            await inquiry.remove();
+            await Inquiry.findByIdAndDelete(req.params.id);
             
             res.status(200).json({ message: 'Inquiry deleted successfully' });
         } catch (error) {
@@ -241,18 +203,6 @@ const inquiryController = {
             
             const updatedInquiry = await inquiry.save();
             
-            // If inquiry is assigned to someone else, notify them
-            if (inquiry.assignedTo && 
-                inquiry.assignedTo.toString() !== req.user.id.toString()) {
-                await notificationService.createNotification({
-                    userId: inquiry.assignedTo,
-                    title: 'New Note on Inquiry',
-                    message: `A new note has been added to your inquiry from ${inquiry.client.name || 'a client'}`,
-                    relatedModel: 'Inquiry',
-                    relatedId: inquiry._id
-                });
-            }
-            
             res.status(200).json(updatedInquiry);
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -285,18 +235,6 @@ const inquiryController = {
             
             const updatedInquiry = await inquiry.save();
             
-            // Notify assigned user if status changed and they didn't make the change
-            if (inquiry.assignedTo && 
-                inquiry.assignedTo.toString() !== req.user.id.toString()) {
-                await notificationService.createNotification({
-                    userId: inquiry.assignedTo,
-                    title: 'Inquiry Status Updated',
-                    message: `The status of an inquiry has been updated to ${status}`,
-                    relatedModel: 'Inquiry',
-                    relatedId: inquiry._id
-                });
-            }
-            
             res.status(200).json(updatedInquiry);
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -312,7 +250,7 @@ const inquiryController = {
                 return res.status(400).json({ message: 'User ID is required' });
             }
             
-            // Check if assigned user exists and belongs to same hotel
+            // Check if assigned user exists
             const userToAssign = await User.findById(userId);
             
             if (!userToAssign) {
@@ -341,18 +279,11 @@ const inquiryController = {
             
             const updatedInquiry = await inquiry.save();
             
-            // Notify the newly assigned user
-            await notificationService.createNotification({
-                userId,
-                title: 'Inquiry Assigned',
-                message: `You have been assigned an inquiry from ${inquiry.client.name || 'a potential client'}`,
-                relatedModel: 'Inquiry',
-                relatedId: inquiry._id
-            });
-            
             res.status(200).json(updatedInquiry);
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
     }
 };
+
+module.exports = inquiryController;

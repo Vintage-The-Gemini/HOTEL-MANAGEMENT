@@ -1,3 +1,4 @@
+// server/server.js
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -25,45 +26,32 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan("dev"));
 
-// Import routes - comment these out initially to test the server
-// const authRoutes = require("./routes/authRoutes");
-// const hotelRoutes = require("./routes/hotelRoutes");
-// const userRoutes = require("./routes/userRoutes");
-// const resourceRoutes = require("./routes/resourceRoutes");
-// const clientRoutes = require("./routes/clientRoutes");
-// const inquiryRoutes = require("./routes/inquiryRoutes");
-// const quotationRoutes = require("./routes/quotationRoutes");
-// const bookingRoutes = require("./routes/bookingRoutes");
-// const invoiceRoutes = require("./routes/invoiceRoutes");
-// const paymentRoutes = require("./routes/paymentRoutes");
-// const agentRoutes = require("./routes/agentRoutes");
-// const reportRoutes = require("./routes/reportRoutes");
-// const notificationRoutes = require("./routes/notificationRoutes");
-
 // Simple test route
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Server is working!' });
 });
 
-// Use routes - comment these out initially
-// app.use("/api/auth", authRoutes);
-// app.use("/api/hotels", hotelRoutes);
+// Use routes - uncomment these one by one as you implement them
+const authRoutes = require("./routes/authRoutes");
+app.use("/api/auth", authRoutes);
+
+// Only uncomment these once you've fixed the controller implementations
+// const userRoutes = require("./routes/userRoutes");
 // app.use("/api/users", userRoutes);
-// app.use("/api/resources", resourceRoutes);
-// app.use("/api/clients", clientRoutes);
+
+// const hotelRoutes = require("./routes/hotelRoutes");
+// app.use("/api/hotels", hotelRoutes);
+
+// const inquiryRoutes = require("./routes/inquiryRoutes");
 // app.use("/api/inquiries", inquiryRoutes);
+
+// const quotationRoutes = require("./routes/quotationRoutes");
 // app.use("/api/quotations", quotationRoutes);
-// app.use("/api/bookings", bookingRoutes);
-// app.use("/api/invoices", invoiceRoutes);
-// app.use("/api/payments", paymentRoutes);
-// app.use("/api/agents", agentRoutes);
-// app.use("/api/reports", reportRoutes);
-// app.use("/api/notifications", notificationRoutes);
 
 // Simple error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: err.message });
+  res.status(500).json({ message: err.message || 'Something went wrong!' });
 });
 
 app.listen(PORT, () => {
