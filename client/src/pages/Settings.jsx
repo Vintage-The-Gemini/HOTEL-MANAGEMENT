@@ -1,690 +1,358 @@
 // src/pages/Settings.jsx
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import {
-  UserIcon,
-  BuildingOfficeIcon,
-  CreditCardIcon,
-  BellIcon,
-  LockClosedIcon,
-  PaintBrushIcon
-} from '@heroicons/react/24/outline';
 
 const Settings = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
-  
-  // Mock profile data for demo
-  const [profileData, setProfileData] = useState({
-    name: user?.name || 'John Doe',
-    email: user?.email || 'john@example.com',
-    phone: '555-123-4567',
-    position: 'Sales Representative',
-    bio: 'Experienced sales representative with a focus on hospitality services.'
-  });
-  
-  // Mock hotel data for demo
-  const [hotelData, setHotelData] = useState({
-    name: 'Grand Plaza Hotel',
-    address: {
-      street: '123 Main St',
-      city: 'New York',
-      state: 'NY',
-      postalCode: '10001',
-      country: 'USA'
-    },
-    contact: {
-      email: 'info@grandplaza.com',
-      phone: '555-987-6543',
-      website: 'www.grandplaza.com'
-    },
-    taxSettings: {
-      salesTax: 8.5,
-      serviceTax: 3.0
-    }
-  });
-  
-  // Mock branding data for demo
-  const [brandingData, setBrandingData] = useState({
-    primaryColor: '#0ea5e9',
-    secondaryColor: '#0369a1',
-    logo: 'https://example.com/logo.png'
+
+  const [profileForm, setProfileForm] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
   });
 
-  // Mock notification settings
-  const [notificationSettings, setNotificationSettings] = useState({
-    email: {
-      newInquiry: true,
-      newQuotation: true,
-      quotationStatus: true,
-      paymentReceived: true
-    },
-    inApp: {
-      newInquiry: true,
-      newQuotation: true,
-      quotationStatus: true,
-      paymentReceived: true,
-      taskAssigned: true
-    }
-  });
-
-  // Mock security settings
-  const [securityData, setSecurityData] = useState({
+  const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
-    twoFactorEnabled: false,
-    lastPasswordChange: '2023-04-15'
   });
 
-  // Mock billing data
-  const [billingData, setBillingData] = useState({
-    plan: 'Professional',
-    billingCycle: 'Monthly',
-    amount: 49.99,
-    nextBillingDate: '2023-06-15',
-    paymentMethod: {
-      type: 'Credit Card',
-      last4: '4242',
-      expiry: '05/25'
-    }
+  const [notificationSettings, setNotificationSettings] = useState({
+    emailNotifications: true,
+    inAppNotifications: true,
+    dailyDigest: false,
+    marketingEmails: false,
   });
-  
+
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
-    setProfileData((prev) => ({
+    setProfileForm((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleHotelChange = (e) => {
+  const handlePasswordChange = (e) => {
     const { name, value } = e.target;
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setHotelData((prev) => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: value
-        }
-      }));
-    } else {
-      setHotelData((prev) => ({
-        ...prev,
-        [name]: value
-      }));
-    }
-  };
-
-  const handleBrandingChange = (e) => {
-    const { name, value } = e.target;
-    setBrandingData((prev) => ({
+    setPasswordForm((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleNotificationChange = (e) => {
     const { name, checked } = e.target;
-    const [category, setting] = name.split('.');
-    
-    setNotificationSettings(prev => ({
+    setNotificationSettings((prev) => ({
       ...prev,
-      [category]: {
-        ...prev[category],
-        [setting]: checked
-      }
+      [name]: checked,
     }));
   };
 
-  const handleSecurityChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setSecurityData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+  const handleProfileSubmit = (e) => {
+    e.preventDefault();
+    // Handle profile update
+    console.log('Profile form submitted:', profileForm);
   };
-  
-  const tabs = [
-    { id: 'profile', name: 'Profile', icon: UserIcon },
-    { id: 'hotel', name: 'Hotel Details', icon: BuildingOfficeIcon },
-    { id: 'branding', name: 'Branding', icon: PaintBrushIcon },
-    { id: 'billing', name: 'Billing', icon: CreditCardIcon },
-    { id: 'notifications', name: 'Notifications', icon: BellIcon },
-    { id: 'security', name: 'Security', icon: LockClosedIcon }
-  ];
+
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault();
+    // Handle password change
+    console.log('Password form submitted:', passwordForm);
+  };
+
+  const handleNotificationSubmit = (e) => {
+    e.preventDefault();
+    // Handle notification settings update
+    console.log('Notification settings submitted:', notificationSettings);
+  };
 
   return (
     <div className="py-6">
       <div className="px-4 sm:px-6 md:px-0">
         <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
       </div>
-      
+
       <div className="mt-6">
-        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-          {/* Tabs */}
-          <div className="border-b border-gray-200">
-            <div className="sm:hidden">
-              <select
-                onChange={(e) => setActiveTab(e.target.value)}
-                value={activeTab}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-              >
-                {tabs.map((tab) => (
-                  <option key={tab.id} value={tab.id}>
-                    {tab.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="hidden sm:block">
-              <nav className="flex space-x-8 px-6" aria-label="Tabs">
-                {tabs.map((tab) => {
-                  const Icon = tab.icon;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`
-                        ${activeTab === tab.id
-                          ? 'border-primary-500 text-primary-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
-                        whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center
-                      `}
-                    >
-                      <Icon className="h-5 w-5 mr-2" />
-                      {tab.name}
-                    </button>
-                  );
-                })}
-              </nav>
-            </div>
-          </div>
-          
-          {/* Profile Tab */}
-          {activeTab === 'profile' && (
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Personal Information</h3>
-              <form className="space-y-6">
-                <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                  <div className="sm:col-span-3">
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                      Full name
-                    </label>
-                    <div className="mt-1">
+        {/* Tabs */}
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+            <button
+              onClick={() => setActiveTab('profile')}
+              className={`${
+                activeTab === 'profile'
+                  ? 'border-primary-500 text-primary-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Profile Settings
+            </button>
+            <button
+              onClick={() => setActiveTab('password')}
+              className={`${
+                activeTab === 'password'
+                  ? 'border-primary-500 text-primary-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Change Password
+            </button>
+            <button
+              onClick={() => setActiveTab('notifications')}
+              className={`${
+                activeTab === 'notifications'
+                  ? 'border-primary-500 text-primary-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Notification Settings
+            </button>
+          </nav>
+        </div>
+
+        {/* Profile Settings */}
+        {activeTab === 'profile' && (
+          <div className="mt-6 bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+            <div className="md:grid md:grid-cols-3 md:gap-6">
+              <div className="md:col-span-1">
+                <h3 className="text-lg font-medium leading-6 text-gray-900">Profile Information</h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Update your personal information and contact details.
+                </p>
+              </div>
+              <div className="mt-5 md:mt-0 md:col-span-2">
+                <form onSubmit={handleProfileSubmit}>
+                  <div className="grid grid-cols-6 gap-6">
+                    <div className="col-span-6 sm:col-span-4">
+                      <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                        Full Name
+                      </label>
                       <input
                         type="text"
                         name="name"
                         id="name"
-                        value={profileData.name}
+                        value={profileForm.name}
                         onChange={handleProfileChange}
-                        className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        className="mt-1 focus:ring-primary-500 focus:border-primary-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                       />
                     </div>
-                  </div>
-                  
-                  <div className="sm:col-span-3">
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                      Email address
-                    </label>
-                    <div className="mt-1">
+
+                    <div className="col-span-6 sm:col-span-4">
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                        Email address
+                      </label>
                       <input
                         type="email"
                         name="email"
                         id="email"
-                        value={profileData.email}
+                        value={profileForm.email}
                         onChange={handleProfileChange}
-                        className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        className="mt-1 focus:ring-primary-500 focus:border-primary-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                       />
                     </div>
-                  </div>
-                  
-                  <div className="sm:col-span-3">
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                      Phone number
-                    </label>
-                    <div className="mt-1">
+
+                    <div className="col-span-6 sm:col-span-4">
+                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                        Phone Number
+                      </label>
                       <input
-                        type="text"
+                        type="tel"
                         name="phone"
                         id="phone"
-                        value={profileData.phone}
+                        value={profileForm.phone}
                         onChange={handleProfileChange}
-                        className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        className="mt-1 focus:ring-primary-500 focus:border-primary-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                       />
                     </div>
                   </div>
-                  
-                  <div className="sm:col-span-3">
-                    <label htmlFor="position" className="block text-sm font-medium text-gray-700">
-                      Position
-                    </label>
-                    <div className="mt-1">
-                      <input
-                        type="text"
-                        name="position"
-                        id="position"
-                        value={profileData.position}
-                        onChange={handleProfileChange}
-                        className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                      />
-                    </div>
+                  <div className="mt-6">
+                    <button
+                      type="submit"
+                      className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                    >
+                      Save
+                    </button>
                   </div>
-                  
-                  <div className="sm:col-span-6">
-                    <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
-                      Bio
-                    </label>
-                    <div className="mt-1">
-                      <textarea
-                        id="bio"
-                        name="bio"
-                        rows={4}
-                        value={profileData.bio}
-                        onChange={handleProfileChange}
-                        className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                      />
-                    </div>
-                    <p className="mt-2 text-sm text-gray-500">
-                      Brief description about yourself.
-                    </p>
-                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
 
-                  <div className="sm:col-span-6">
-                    <label htmlFor="photo" className="block text-sm font-medium text-gray-700">
-                      Profile photo
-                    </label>
-                    <div className="mt-1 flex items-center">
-                      <span className="h-12 w-12 rounded-full overflow-hidden bg-gray-100">
-                        <svg className="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                      </span>
-                      <button
-                        type="button"
-                        className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                      >
-                        Change
-                      </button>
+        {/* Password Settings */}
+        {activeTab === 'password' && (
+          <div className="mt-6 bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+            <div className="md:grid md:grid-cols-3 md:gap-6">
+              <div className="md:col-span-1">
+                <h3 className="text-lg font-medium leading-6 text-gray-900">Change Password</h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Update your password to maintain account security.
+                </p>
+              </div>
+              <div className="mt-5 md:mt-0 md:col-span-2">
+                <form onSubmit={handlePasswordSubmit}>
+                  <div className="grid grid-cols-6 gap-6">
+                    <div className="col-span-6 sm:col-span-4">
+                      <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
+                        Current Password
+                      </label>
+                      <input
+                        type="password"
+                        name="currentPassword"
+                        id="currentPassword"
+                        value={passwordForm.currentPassword}
+                        onChange={handlePasswordChange}
+                        className="mt-1 focus:ring-primary-500 focus:border-primary-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      />
+                    </div>
+
+                    <div className="col-span-6 sm:col-span-4">
+                      <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+                        New Password
+                      </label>
+                      <input
+                        type="password"
+                        name="newPassword"
+                        id="newPassword"
+                        value={passwordForm.newPassword}
+                        onChange={handlePasswordChange}
+                        className="mt-1 focus:ring-primary-500 focus:border-primary-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      />
+                    </div>
+
+                    <div className="col-span-6 sm:col-span-4">
+                      <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                        Confirm New Password
+                      </label>
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        id="confirmPassword"
+                        value={passwordForm.confirmPassword}
+                        onChange={handlePasswordChange}
+                        className="mt-1 focus:ring-primary-500 focus:border-primary-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      />
                     </div>
                   </div>
-                </div>
-                
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                  >
-                    Save
-                  </button>
-                </div>
-              </form>
+                  <div className="mt-6">
+                    <button
+                      type="submit"
+                      className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                    >
+                      Update Password
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
-          )}
-          
-          {/* Hotel Details Tab */}
-          {activeTab === 'hotel' && (
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Hotel Information</h3>
-              <form className="space-y-6">
-                <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                  <div className="sm:col-span-6">
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                      Hotel name
-                    </label>
-                    <div className="mt-1">
-                      <input
-                        type="text"
-                        name="name"
-                        id="name"
-                        value={hotelData.name}
-                        onChange={handleHotelChange}
-                        className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                      />
+          </div>
+        )}
+
+        {/* Notification Settings */}
+        {activeTab === 'notifications' && (
+          <div className="mt-6 bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+            <div className="md:grid md:grid-cols-3 md:gap-6">
+              <div className="md:col-span-1">
+                <h3 className="text-lg font-medium leading-6 text-gray-900">Notification Settings</h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Choose how you want to receive notifications and updates.
+                </p>
+              </div>
+              <div className="mt-5 md:mt-0 md:col-span-2">
+                <form onSubmit={handleNotificationSubmit}>
+                  <div className="space-y-6">
+                    <div className="flex items-start">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="emailNotifications"
+                          name="emailNotifications"
+                          type="checkbox"
+                          checked={notificationSettings.emailNotifications}
+                          onChange={handleNotificationChange}
+                          className="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300 rounded"
+                        />
+                      </div>
+                      <div className="ml-3 text-sm">
+                        <label htmlFor="emailNotifications" className="font-medium text-gray-700">
+                          Email Notifications
+                        </label>
+                        <p className="text-gray-500">Receive email notifications for important updates.</p>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="sm:col-span-6">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Address</h4>
-                    <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                      <div className="sm:col-span-6">
-                        <label htmlFor="address.street" className="block text-sm font-medium text-gray-700">
-                          Street address
-                        </label>
-                        <div className="mt-1">
-                          <input
-                            type="text"
-                            name="address.street"
-                            id="address.street"
-                            value={hotelData.address.street}
-                            onChange={handleHotelChange}
-                            className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          />
-                        </div>
+
+                    <div className="flex items-start">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="inAppNotifications"
+                          name="inAppNotifications"
+                          type="checkbox"
+                          checked={notificationSettings.inAppNotifications}
+                          onChange={handleNotificationChange}
+                          className="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300 rounded"
+                        />
                       </div>
-                      
-                      <div className="sm:col-span-2">
-                        <label htmlFor="address.city" className="block text-sm font-medium text-gray-700">
-                          City
+                      <div className="ml-3 text-sm">
+                        <label htmlFor="inAppNotifications" className="font-medium text-gray-700">
+                          In-App Notifications
                         </label>
-                        <div className="mt-1">
-                          <input
-                            type="text"
-                            name="address.city"
-                            id="address.city"
-                            value={hotelData.address.city}
-                            onChange={handleHotelChange}
-                            className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          />
-                        </div>
+                        <p className="text-gray-500">Receive notifications within the application.</p>
                       </div>
-                      
-                      <div className="sm:col-span-2">
-                        <label htmlFor="address.state" className="block text-sm font-medium text-gray-700">
-                          State / Province
-                        </label>
-                        <div className="mt-1">
-                          <input
-                            type="text"
-                            name="address.state"
-                            id="address.state"
-                            value={hotelData.address.state}
-                            onChange={handleHotelChange}
-                            className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          />
-                        </div>
+                    </div>
+
+                    <div className="flex items-start">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="dailyDigest"
+                          name="dailyDigest"
+                          type="checkbox"
+                          checked={notificationSettings.dailyDigest}
+                          onChange={handleNotificationChange}
+                          className="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300 rounded"
+                        />
                       </div>
-                      
-                      <div className="sm:col-span-2">
-                        <label htmlFor="address.postalCode" className="block text-sm font-medium text-gray-700">
-                          ZIP / Postal code
+                      <div className="ml-3 text-sm">
+                        <label htmlFor="dailyDigest" className="font-medium text-gray-700">
+                          Daily Digest
                         </label>
-                        <div className="mt-1">
-                          <input
-                            type="text"
-                            name="address.postalCode"
-                            id="address.postalCode"
-                            value={hotelData.address.postalCode}
-                            onChange={handleHotelChange}
-                            className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          />
-                        </div>
+                        <p className="text-gray-500">Receive a daily summary of all activities.</p>
                       </div>
-                      
-                      <div className="sm:col-span-3">
-                        <label htmlFor="address.country" className="block text-sm font-medium text-gray-700">
-                          Country
+                    </div>
+
+                    <div className="flex items-start">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="marketingEmails"
+                          name="marketingEmails"
+                          type="checkbox"
+                          checked={notificationSettings.marketingEmails}
+                          onChange={handleNotificationChange}
+                          className="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300 rounded"
+                        />
+                      </div>
+                      <div className="ml-3 text-sm">
+                        <label htmlFor="marketingEmails" className="font-medium text-gray-700">
+                          Marketing Emails
                         </label>
-                        <div className="mt-1">
-                          <select
-                            id="address.country"
-                            name="address.country"
-                            value={hotelData.address.country}
-                            onChange={handleHotelChange}
-                            className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          >
-                            <option value="USA">United States</option>
-                            <option value="CAN">Canada</option>
-                            <option value="GBR">United Kingdom</option>
-                            <option value="AUS">Australia</option>
-                          </select>
-                        </div>
+                        <p className="text-gray-500">Receive marketing and promotional emails.</p>
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="sm:col-span-6">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Contact Information</h4>
-                    <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                      <div className="sm:col-span-3">
-                        <label htmlFor="contact.email" className="block text-sm font-medium text-gray-700">
-                          Email address
-                        </label>
-                        <div className="mt-1">
-                          <input
-                            type="email"
-                            name="contact.email"
-                            id="contact.email"
-                            value={hotelData.contact.email}
-                            onChange={handleHotelChange}
-                            className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="sm:col-span-3">
-                        <label htmlFor="contact.phone" className="block text-sm font-medium text-gray-700">
-                          Phone number
-                        </label>
-                        <div className="mt-1">
-                          <input
-                            type="text"
-                            name="contact.phone"
-                            id="contact.phone"
-                            value={hotelData.contact.phone}
-                            onChange={handleHotelChange}
-                            className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="sm:col-span-3">
-                        <label htmlFor="contact.website" className="block text-sm font-medium text-gray-700">
-                          Website
-                        </label>
-                        <div className="mt-1">
-                          <input
-                            type="text"
-                            name="contact.website"
-                            id="contact.website"
-                            value={hotelData.contact.website}
-                            onChange={handleHotelChange}
-                            className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          />
-                        </div>
-                      </div>
-                    </div>
+                  <div className="mt-6">
+                    <button
+                      type="submit"
+                      className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                    >
+                      Save Preferences
+                    </button>
                   </div>
-                  
-                  <div className="sm:col-span-6">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Tax Settings</h4>
-                    <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                      <div className="sm:col-span-3">
-                        <label htmlFor="taxSettings.salesTax" className="block text-sm font-medium text-gray-700">
-                          Sales Tax (%)
-                        </label>
-                        <div className="mt-1">
-                          <input
-                            type="number"
-                            step="0.01"
-                            name="taxSettings.salesTax"
-                            id="taxSettings.salesTax"
-                            value={hotelData.taxSettings.salesTax}
-                            onChange={handleHotelChange}
-                            className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="sm:col-span-3">
-                        <label htmlFor="taxSettings.serviceTax" className="block text-sm font-medium text-gray-700">
-                          Service Tax (%)
-                        </label>
-                        <div className="mt-1">
-                          <input
-                            type="number"
-                            step="0.01"
-                            name="taxSettings.serviceTax"
-                            id="taxSettings.serviceTax"
-                            value={hotelData.taxSettings.serviceTax}
-                            onChange={handleHotelChange}
-                            className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                  >
-                    Save
-                  </button>
-                </div>
-              </form>
+                </form>
+              </div>
             </div>
-          )}
-          
-          {/* Branding Tab */}
-          {activeTab === 'branding' && (
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Branding Settings</h3>
-              <form className="space-y-6">
-                <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                  <div className="sm:col-span-6">
-                    <label htmlFor="logo" className="block text-sm font-medium text-gray-700">
-                      Logo
-                    </label>
-                    <div className="mt-1 flex items-center">
-                      <span className="h-12 w-12 rounded overflow-hidden bg-gray-100">
-                        <svg className="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                      </span>
-                      <button
-                        type="button"
-                        className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                      >
-                        Upload
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div className="sm:col-span-3">
-                    <label htmlFor="primaryColor" className="block text-sm font-medium text-gray-700">
-                      Primary Color
-                    </label>
-                    <div className="mt-1 flex items-center">
-                      <input
-                        type="color"
-                        name="primaryColor"
-                        id="primaryColor"
-                        value={brandingData.primaryColor}
-                        onChange={handleBrandingChange}
-                        className="h-8 w-8 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                      />
-                      <input
-                        type="text"
-                        name="primaryColor"
-                        value={brandingData.primaryColor}
-                        onChange={handleBrandingChange}
-                        className="ml-2 shadow-sm focus:ring-primary-500 focus:border-primary-500 block sm:text-sm border-gray-300 rounded-md"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="sm:col-span-3">
-                    <label htmlFor="secondaryColor" className="block text-sm font-medium text-gray-700">
-                      Secondary Color
-                    </label>
-                    <div className="mt-1 flex items-center">
-                      <input
-                        type="color"
-                        name="secondaryColor"
-                        id="secondaryColor"
-                        value={brandingData.secondaryColor}
-                        onChange={handleBrandingChange}
-                        className="h-8 w-8 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                      />
-                      <input
-                        type="text"
-                        name="secondaryColor"
-                        value={brandingData.secondaryColor}
-                        onChange={handleBrandingChange}
-                        className="ml-2 shadow-sm focus:ring-primary-500 focus:border-primary-500 block sm:text-sm border-gray-300 rounded-md"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="sm:col-span-6">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Preview</h4>
-                    <div className="border border-gray-200 rounded-md p-4">
-                      <div className="flex items-center space-x-4">
-                        <div 
-                          className="w-16 h-16 rounded-full" 
-                          style={{ backgroundColor: brandingData.primaryColor }}
-                        ></div>
-                        <div>
-                          <p className="text-lg font-bold" style={{ color: brandingData.primaryColor }}>{hotelData.name}</p>
-                          <div className="mt-2">
-                            <button
-                              type="button"
-                              className="px-4 py-2 text-sm font-medium text-white rounded-md"
-                              style={{ backgroundColor: brandingData.primaryColor }}
-                            >
-                              Primary Button
-                            </button>
-                            <button
-                              type="button"
-                              className="ml-2 px-4 py-2 text-sm font-medium text-white rounded-md"
-                              style={{ backgroundColor: brandingData.secondaryColor }}
-                            >
-                              Secondary Button
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                  >
-                    Save
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-          
-          {/* Billing Tab */}
-          {activeTab === 'billing' && (
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Billing Information</h3>
-              
-              <div className="mb-8">
-                <h4 className="text-base font-medium text-gray-900 mb-2">Current Plan</h4>
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-xl font-bold text-gray-900">{billingData.plan}</p>
-                      <p className="text-sm text-gray-500">
-                        {billingData.billingCycle} billing at ${billingData.amount}/month
-                      </p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Next billing date:
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Settings;
