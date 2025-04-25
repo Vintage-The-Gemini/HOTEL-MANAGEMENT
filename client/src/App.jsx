@@ -2,8 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import { NotificationProvider } from './contexts/NotificationContext';
-import ProtectedRoute from './components/common/ProtectedRoute';
 import DashboardLayout from './components/layout/DashboardLayout';
 
 // Auth pages
@@ -42,27 +40,25 @@ function App() {
 
   return (
     <AuthProvider>
-      <NotificationProvider>
-        <Router>
-          <Routes>
-            {/* Auth routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            
-            {/* Protected routes with dashboard layout */}
-            <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/inquiries" element={<Inquiries />} />
-              <Route path="/inquiries/:id" element={<InquiryDetail />} />
-              <Route path="/quotations" element={<Quotations />} />
-              <Route path="/quotations/:id" element={<QuotationDetail />} />
-              <Route path="/clients" element={<Clients />} />
-              <Route path="/settings" element={<Settings />} />
-            </Route>
-          </Routes>
-        </Router>
-      </NotificationProvider>
+      <Router>
+        <Routes>
+          {/* Auth routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          
+          {/* For now, don't use ProtectedRoute to see if the UI works */}
+          <Route element={<DashboardLayout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/inquiries" element={<Inquiries />} />
+            <Route path="/inquiries/:id" element={<InquiryDetail />} />
+            <Route path="/quotations" element={<Quotations />} />
+            <Route path="/quotations/:id" element={<QuotationDetail />} />
+            <Route path="/clients" element={<Clients />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
+        </Routes>
+      </Router>
     </AuthProvider>
   );
 }

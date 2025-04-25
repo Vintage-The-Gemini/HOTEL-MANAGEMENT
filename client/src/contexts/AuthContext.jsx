@@ -1,5 +1,5 @@
 // src/contexts/AuthContext.jsx
-import { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 export const AuthContext = createContext();
@@ -12,34 +12,23 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Check for existing token and verify user on mount
+  // For the prototype, we'll simulate authentication
   useEffect(() => {
-    const verifyUser = async () => {
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        const res = await axios.get(`${API_URL}/auth/verify`);
-        
-        if (res.data.user) {
-          setUser(res.data.user);
-          setIsAuthenticated(true);
-        }
-      } catch (err) {
-        console.error('Auth verification error:', err);
-        localStorage.removeItem('token');
-        delete axios.defaults.headers.common['Authorization'];
-      } finally {
-        setLoading(false);
-      }
+    const simulateAuth = () => {
+      // For demo purposes, assume we're logged in
+      setUser({
+        id: '1',
+        name: 'Demo User',
+        email: 'demo@example.com',
+        role: 'HOTEL_ADMIN',
+        hotelId: 'h1'
+      });
+      setIsAuthenticated(true);
+      setLoading(false);
     };
 
-    verifyUser();
+    // Simulate API delay
+    setTimeout(simulateAuth, 1000);
   }, []);
 
   // Register user
@@ -48,21 +37,27 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     
     try {
-      const res = await axios.post(`${API_URL}/auth/register`, userData);
+      // Simulate API call
+      console.log('Registering user:', userData);
       
-      if (res.data.token) {
-        localStorage.setItem('token', res.data.token);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
-        setUser(res.data.user);
+      // Simulated successful response
+      setTimeout(() => {
+        setUser({
+          id: '1',
+          name: userData.name,
+          email: userData.email,
+          role: userData.role,
+          hotelId: userData.hotelId
+        });
         setIsAuthenticated(true);
-      }
+        setLoading(false);
+      }, 1000);
       
-      return res.data;
+      return { success: true };
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
-      throw err;
-    } finally {
+      setError('Registration failed');
       setLoading(false);
+      throw err;
     }
   };
 
@@ -72,36 +67,34 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     
     try {
-      const res = await axios.post(`${API_URL}/auth/login`, { email, password });
+      // Simulate API call
+      console.log('Logging in user:', email);
       
-      if (res.data.token) {
-        localStorage.setItem('token', res.data.token);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
-        setUser(res.data.user);
+      // Simulated successful response
+      setTimeout(() => {
+        setUser({
+          id: '1',
+          name: 'Demo User',
+          email: email,
+          role: 'HOTEL_ADMIN',
+          hotelId: 'h1'
+        });
         setIsAuthenticated(true);
-      }
+        setLoading(false);
+      }, 1000);
       
-      return res.data;
+      return { success: true };
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
-      throw err;
-    } finally {
+      setError('Login failed');
       setLoading(false);
+      throw err;
     }
   };
 
   // Logout user
   const logout = async () => {
-    try {
-      await axios.get(`${API_URL}/auth/logout`);
-    } catch (err) {
-      console.error('Logout error:', err);
-    } finally {
-      localStorage.removeItem('token');
-      delete axios.defaults.headers.common['Authorization'];
-      setUser(null);
-      setIsAuthenticated(false);
-    }
+    setUser(null);
+    setIsAuthenticated(false);
   };
 
   // Request password reset
@@ -110,13 +103,19 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     
     try {
-      const res = await axios.post(`${API_URL}/auth/forgot-password`, { email });
-      return res.data;
+      // Simulate API call
+      console.log('Password reset requested for:', email);
+      
+      // Simulated successful response
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+      
+      return { success: true };
     } catch (err) {
-      setError(err.response?.data?.message || 'Password reset request failed');
-      throw err;
-    } finally {
+      setError('Password reset request failed');
       setLoading(false);
+      throw err;
     }
   };
 
@@ -126,13 +125,19 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     
     try {
-      const res = await axios.post(`${API_URL}/auth/reset-password`, { token, password });
-      return res.data;
+      // Simulate API call
+      console.log('Resetting password with token:', token);
+      
+      // Simulated successful response
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+      
+      return { success: true };
     } catch (err) {
-      setError(err.response?.data?.message || 'Password reset failed');
-      throw err;
-    } finally {
+      setError('Password reset failed');
       setLoading(false);
+      throw err;
     }
   };
 
@@ -155,3 +160,5 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+export default AuthContext;
