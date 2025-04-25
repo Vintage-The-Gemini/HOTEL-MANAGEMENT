@@ -11,20 +11,16 @@ import {
   CogIcon, 
   ChartBarIcon
 } from '@heroicons/react/24/outline';
-import { useAuth } from '../../hooks/useAuth';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: HomeIcon },
   { name: 'Inquiries', href: '/inquiries', icon: ClipboardDocumentListIcon },
   { name: 'Quotations', href: '/quotations', icon: DocumentTextIcon },
   { name: 'Clients', href: '/clients', icon: UserGroupIcon },
-  { name: 'Reports', href: '/reports', icon: ChartBarIcon },
   { name: 'Settings', href: '/settings', icon: CogIcon },
 ];
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
-  const { user } = useAuth();
-
+const Sidebar = ({ sidebarOpen, setSidebarOpen, user }) => {
   return (
     <>
       {/* Mobile sidebar */}
@@ -73,7 +69,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               </Transition.Child>
               <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
                 <div className="flex-shrink-0 flex items-center px-4">
-                  <span className="text-xl font-bold text-primary-600">HotelMS</span>
+                  <span className="text-xl font-bold text-blue-600">HotelMS</span>
                 </div>
                 <nav className="mt-5 px-2 space-y-1">
                   {navigation.map((item) => {
@@ -85,10 +81,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         className={({ isActive }) =>
                           `group flex items-center px-2 py-2 text-base font-medium rounded-md ${
                             isActive
-                              ? 'bg-primary-100 text-primary-600'
+                              ? 'bg-blue-100 text-blue-600'
                               : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                           }`
                         }
+                        onClick={() => setSidebarOpen(false)}
                       >
                         <Icon
                           className="mr-4 h-6 w-6 flex-shrink-0"
@@ -104,16 +101,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                 <div className="flex-shrink-0 group block">
                   <div className="flex items-center">
                     <div>
-                      <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                      <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-gray-400">
                         {user?.name?.charAt(0).toUpperCase() || 'U'}
                       </div>
                     </div>
                     <div className="ml-3">
-                      <p className="text-base font-medium text-gray-700 group-hover:text-gray-900">
-                        {user?.name || 'User'}
+                      <p className="text-base font-medium text-gray-700">
+                        {user?.name || 'Admin User'}
                       </p>
-                      <p className="text-sm font-medium text-gray-500 group-hover:text-gray-700">
-                        {user?.role || 'Role'}
+                      <p className="text-sm font-medium text-gray-500">
+                        {user?.role || 'Admin'}
                       </p>
                     </div>
                   </div>
@@ -130,7 +127,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
         <div className="flex-1 flex flex-col min-h-0 border-r border-gray-200 bg-white">
           <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
             <div className="flex items-center flex-shrink-0 px-4">
-              <span className="text-xl font-bold text-primary-600">HotelMS</span>
+              <span className="text-xl font-bold text-blue-600">HotelMS</span>
             </div>
             <nav className="mt-5 flex-1 px-2 space-y-1">
               {navigation.map((item) => {
@@ -142,7 +139,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                     className={({ isActive }) =>
                       `group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
                         isActive
-                          ? 'bg-primary-100 text-primary-600'
+                          ? 'bg-blue-100 text-blue-600'
                           : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                       }`
                     }
@@ -161,16 +158,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
             <div className="flex-shrink-0 w-full group block">
               <div className="flex items-center">
                 <div>
-                  <div className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                    {user?.name?.charAt(0).toUpperCase() || 'U'}
+                  <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-gray-400">
+                    {user?.name?.charAt(0).toUpperCase() || 'A'}
                   </div>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
-                    {user?.name || 'User'}
+                  <p className="text-sm font-medium text-gray-700">
+                    {user?.name || 'Admin User'}
                   </p>
-                  <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
-                    {user?.role || 'Role'}
+                  <p className="text-xs font-medium text-gray-500">
+                    {user?.role || 'Admin'}
                   </p>
                 </div>
               </div>

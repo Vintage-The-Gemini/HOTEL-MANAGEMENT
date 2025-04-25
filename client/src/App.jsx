@@ -1,13 +1,7 @@
 // src/App.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
 import DashboardLayout from './components/layout/DashboardLayout';
-
-// Auth pages
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
 
 // Main pages
 import Dashboard from './pages/Dashboard';
@@ -22,44 +16,83 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading for demonstration purposes
+    // Initialize Tailwind from CDN for the prototype
+    const tailwindScript = document.createElement('script');
+    tailwindScript.src = 'https://cdn.tailwindcss.com';
+    document.head.appendChild(tailwindScript);
+    
+    // Configure Tailwind
+    const tailwindConfig = document.createElement('script');
+    tailwindConfig.textContent = `
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: '#f0f9ff',
+                100: '#e0f2fe',
+                200: '#bae6fd',
+                300: '#7dd3fc',
+                400: '#38bdf8',
+                500: '#0ea5e9',
+                600: '#0284c7',
+                700: '#0369a1',
+                800: '#075985',
+                900: '#0c4a6e',
+              },
+            }
+          }
+        }
+      }
+    `;
+    document.head.appendChild(tailwindConfig);
+    
+    // Set a mock user in localStorage for the components that need it
+    localStorage.setItem('user', JSON.stringify({
+      id: '1',
+      name: 'Admin User',
+      email: 'admin@hotelms.com',
+      role: 'HOTEL_ADMIN'
+    }));
+    
+    // Set a mock token
+    localStorage.setItem('token', 'mock-jwt-token');
+    
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 1000);
+    }, 800);
     
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+    };
   }, []);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="w-16 h-16 border-4 border-primary-400 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Auth routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          
-          {/* For now, don't use ProtectedRoute to see if the UI works */}
-          <Route element={<DashboardLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/inquiries" element={<Inquiries />} />
-            <Route path="/inquiries/:id" element={<InquiryDetail />} />
-            <Route path="/quotations" element={<Quotations />} />
-            <Route path="/quotations/:id" element={<QuotationDetail />} />
-            <Route path="/clients" element={<Clients />} />
-            <Route path="/settings" element={<Settings />} />
-          </Route>
-        </Routes>
-      </Router>
-    </AuthProvider>
+    <Router>
+      <Routes>
+        {/* Main layout with dashboard - no auth protection */}
+        <Route path="/" element={<DashboardLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="inquiries" element={<Inquiries />} />
+          <Route path="inquiries/:id" element={<InquiryDetail />} />
+          <Route path="quotations" element={<Quotations />} />
+          <Route path="quotations/:id" element={<QuotationDetail />} />
+          <Route path="clients" element={<Clients />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
+        
+        {/* Redirect any other route to the dashboard */}
+        <Route path="*" element={<DashboardLayout />} />
+      </Routes>
+    </Router>
   );
 }
 
