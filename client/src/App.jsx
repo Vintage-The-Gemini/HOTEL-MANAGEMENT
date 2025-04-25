@@ -11,14 +11,16 @@ import Footer from './components/Footer';
 
 const App = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 text-gray-900">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <Navbar />
-      <main className="flex-grow p-4">
+      <main className="flex-grow p-4 container mx-auto">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/inquiry" element={<Inquiry />} />
           <Route path="/quote" element={<Quote />} />
           <Route path="/booking" element={<Booking />} />
+          <Route path="/bookings" element={<Booking />} />  {/* Added for nav compatibility */}
+          <Route path="/inquiries" element={<Inquiry />} />  {/* Added for nav compatibility */}
           <Route path="/reports" element={<Reports />} />
         </Routes>
       </main>
