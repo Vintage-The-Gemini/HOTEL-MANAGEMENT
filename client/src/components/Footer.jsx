@@ -1,38 +1,95 @@
-// src/components/Footer.jsx
+// client/src/components/Footer.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-white pt-8 pb-6">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-wrap justify-between">
-          <div className="w-full md:w-4/12 mb-6 md:mb-0">
-            <h4 className="text-2xl font-bold mb-4">HotelFlow</h4>
-            <p className="text-gray-400">
-              Simplifying hotel management with our comprehensive booking and sales pipeline solution.
+    <footer className="bg-white border-t border-gray-200">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col md:flex-row justify-between">
+          <div className="mb-6 md:mb-0">
+            <div className="flex items-center">
+              <span className="text-xl font-bold text-primary-700">Hotel<span className="text-accent-600">Flow</span></span>
+            </div>
+            <p className="mt-2 text-sm text-gray-500 max-w-md">
+              Streamline your hotel management process with our comprehensive booking and quotation system.
             </p>
           </div>
           
-          <div className="w-full md:w-3/12 mb-6 md:mb-0">
-            <h5 className="text-lg font-bold mb-4">Quick Links</h5>
-            <ul className="space-y-2">
-              <li><Link to="/" className="text-gray-400 hover:text-white transition-colors duration-200">Home</Link></li>
-              <li><Link to="/inquiries" className="text-gray-400 hover:text-white transition-colors duration-200">Inquiries</Link></li>
-              <li><Link to="/bookings" className="text-gray-400 hover:text-white transition-colors duration-200">Bookings</Link></li>
-              <li><Link to="/reports" className="text-gray-400 hover:text-white transition-colors duration-200">Reports</Link></li>
-            </ul>
-          </div>
-          
-          <div className="w-full md:w-3/12">
-            <h5 className="text-lg font-bold mb-4">Contact</h5>
-            <p className="text-gray-400 mb-2">Email: info@hotelflow.com</p>
-            <p className="text-gray-400">Phone: +1 (555) 123-4567</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-600 tracking-wider uppercase mb-4">
+                Navigation
+              </h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/" className="text-gray-500 hover:text-primary-700 text-sm">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/dashboard" className="text-gray-500 hover:text-primary-700 text-sm">
+                    Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/inquiries" className="text-gray-500 hover:text-primary-700 text-sm">
+                    Inquiries
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/quotations" className="text-gray-500 hover:text-primary-700 text-sm">
+                    Quotations
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-semibold text-gray-600 tracking-wider uppercase mb-4">
+                Resources
+              </h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/reports" className="text-gray-500 hover:text-primary-700 text-sm">
+                    Reports
+                  </Link>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-500 hover:text-primary-700 text-sm">
+                    Documentation
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-500 hover:text-primary-700 text-sm">
+                    Support
+                  </a>
+                </li>
+              </ul>
+            </div>
+            
+            <div className="col-span-2 md:col-span-1">
+              <h3 className="text-sm font-semibold text-gray-600 tracking-wider uppercase mb-4">
+                Contact
+              </h3>
+              <p className="text-sm text-gray-500">
+                <span className="block">Email: support@hotelflow.com</span>
+                <span className="block mt-1">Phone: +1 (555) 123-4567</span>
+              </p>
+            </div>
           </div>
         </div>
         
-        <div className="border-t border-gray-800 mt-6 pt-6 text-center">
-          <p className="text-sm text-gray-400">© {new Date().getFullYear()} HotelFlow Management. All rights reserved.</p>
+        <div className="mt-8 border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between">
+          <p className="text-sm text-gray-500">&copy; {new Date().getFullYear()} HotelFlow. All rights reserved.</p>
+          <div className="mt-4 md:mt-0">
+            <a href="#" className="text-sm text-gray-500 hover:text-primary-700 mr-4">
+              Privacy Policy
+            </a>
+            <a href="#" className="text-sm text-gray-500 hover:text-primary-700">
+              Terms of Service
+            </a>
+          </div>
         </div>
       </div>
     </footer>
